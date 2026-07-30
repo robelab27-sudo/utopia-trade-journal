@@ -407,13 +407,6 @@ async function renderAll() {
 // ---------------------------------------------------------------------------
 // Monthly / Weekly Breakdown table
 // ---------------------------------------------------------------------------
-function weekKey(dateStr) {
-  const d = new Date(dateStr);
-  const start = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil((((d - start) / 86400000) + start.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
-}
-
 let currentBreakdown = 'monthly';
 
 function renderBreakdownTable(closed) {
