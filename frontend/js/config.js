@@ -6,7 +6,7 @@
 // Leave it as "http://localhost:8787" while developing with `wrangler dev`.
 // ============================================================================
 
-export const API_BASE_URL = 'http://localhost:8787';
+export const API_BASE_URL = 'https://trading-journal-api.abebr.workers.dev';
 
 // How often the sync manager auto-syncs in the background, in milliseconds.
 export const SYNC_INTERVAL_MS = 30_000;
