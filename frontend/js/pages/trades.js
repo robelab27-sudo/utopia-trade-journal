@@ -16,6 +16,7 @@ import { parseImportFile } from '../lib/broker-import.js';
 import { applyThemeForUser } from '../theme.js';
 import { mountAccountSwitcher } from '../components/account-switcher.js';
 import { getActiveAccountId } from '../lib/account-context.js';
+import { effectiveRR } from '../stats.js';
 import '../lib/mobile-nav.js';
 
 let activeAccountId = null; // cached locally since getFilteredSorted() runs synchronously
@@ -167,7 +168,7 @@ function renderTable() {
       <td><span class="dir-badge ${trade.direction}">${trade.direction === 'buy' ? '▲ Buy' : '▼ Sell'}</span></td>
       <td>${escapeHtml(trade.session) || '<span style="color:var(--text-dim)">—</span>'}</td>
       <td>${escapeHtml(trade.strategy) || '<span style="color:var(--text-dim)">—</span>'}</td>
-      <td class="rr-cell">${trade.rr !== null && trade.rr !== undefined ? trade.rr + 'R' : '—'}</td>
+      <td class="rr-cell">${(() => { const r = effectiveRR(trade); return r !== null ? r.toFixed(2) + 'R' : '—'; })()}</td>
       <td class="pnl-cell ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}$${Math.abs(trade.net_profit || 0).toFixed(2)}</td>
       <td><span class="status-chip ${trade.trade_status}">${trade.trade_status}</span></td>
       <td><div class="row-actions">${actionsHtml}</div></td>
