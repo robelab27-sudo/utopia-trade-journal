@@ -7,7 +7,7 @@ import { requireAuth, logout } from '../auth.js';
 import { syncManager, SYNC_STATUS } from '../sync.js';
 import { tradesRepo } from '../repositories/index.js';
 import { getById } from '../db.js';
-import { computeDashboardStats, computeAdvancedStats } from '../stats.js';
+import { computeDashboardStats, computeAdvancedStats, effectiveRR } from '../stats.js';
 import { applyThemeForUser } from '../theme.js';
 import { mountAccountSwitcher } from '../components/account-switcher.js';
 import { getActiveAccountId, getAccounts } from '../lib/account-context.js';
@@ -175,7 +175,7 @@ function renderRRChart(closed) {
     { label: '2–3R', test: (r) => r >= 2 && r < 3 },
     { label: '3R+', test: (r) => r >= 3 },
   ];
-  const rrValues = closed.map((t) => t.rr).filter((v) => typeof v === 'number');
+  const rrValues = closed.map((t) => effectiveRR(t)).filter((v) => v !== null);
   const counts = buckets.map((b) => rrValues.filter(b.test).length);
 
   charts.rr = new Chart(document.getElementById('rrChart'), {
@@ -436,7 +436,7 @@ function renderBreakdownTable(closed) {
     const netPnl = trades.reduce((s, t) => s + t.net_profit, 0);
     const wins = trades.filter((t) => t.net_profit > 0).length;
     const winRate = trades.length > 0 ? (wins / trades.length) * 100 : 0;
-    const rrVals = trades.map((t) => t.rr).filter((v) => typeof v === 'number');
+    const rrVals = trades.map((t) => effectiveRR(t)).filter((v) => v !== null);
     const avgRR = rrVals.length > 0 ? rrVals.reduce((a, b) => a + b, 0) / rrVals.length : null;
     const isPos = netPnl >= 0;
     return `<tr>
