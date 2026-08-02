@@ -13,6 +13,29 @@ function tradeSortKey(trade) {
   return `${trade.exit_date || trade.entry_date || ''}T${trade.exit_time || trade.entry_time || '00:00:00'}`;
 }
 
+/**
+ * Returns a trade's risk:reward ratio — using the stored value if present,
+ * otherwise computing it from entry/stop-loss/take-profit when all three are
+ * available. This matters a lot in practice: MT5 auto-imports and CSV/broker
+ * imports virtually never send an explicit `rr` field, but usually DO include
+ * stop_loss and take_profit, which is everything needed to derive it. Without
+ * this fallback, "Average RR" would show ~0 for almost everyone.
+ */
+export function effectiveRR(trade) {
+  if (typeof trade.rr === 'number' && !isNaN(trade.rr)) return trade.rr;
+
+  const entry = trade.entry_price;
+  const stop = trade.stop_loss;
+  const target = trade.take_profit;
+  if (typeof entry !== 'number' || typeof stop !== 'number' || typeof target !== 'number') return null;
+
+  const riskDistance = Math.abs(entry - stop);
+  const rewardDistance = Math.abs(target - entry);
+  if (riskDistance === 0) return null;
+
+  return rewardDistance / riskDistance;
+}
+
 export function computeAdvancedStats(trades) {
   const closed = trades.filter(isClosed).sort((a, b) => tradeSortKey(a).localeCompare(tradeSortKey(b)));
   if (closed.length === 0) return null;
@@ -30,7 +53,7 @@ export function computeAdvancedStats(trades) {
   const largestWin = wins.reduce((max, t) => Math.max(max, t.net_profit), 0);
   const largestLoss = losses.reduce((min, t) => Math.min(min, t.net_profit), 0);
   const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : (grossProfit > 0 ? Infinity : 0);
-  const rrValues = closed.map((t) => t.rr).filter((v) => typeof v === 'number');
+  const rrValues = closed.map((t) => effectiveRR(t)).filter((v) => v !== null);
   const avgRR = rrValues.length > 0 ? rrValues.reduce((a, b) => a + b, 0) / rrValues.length : 0;
   const expectancy = (winRate / 100) * avgWin - (lossRate / 100) * avgLoss;
 
@@ -144,7 +167,7 @@ export function computeDashboardStats(trades, startingBalance = 0) {
   const avgLoss = losses.length > 0 ? grossLoss / losses.length : 0;
   const largestWin = wins.reduce((max, t) => Math.max(max, t.net_profit), 0);
   const largestLoss = losses.reduce((min, t) => Math.min(min, t.net_profit), 0);
-  const rrValues = closed.map((t) => t.rr).filter((v) => typeof v === 'number');
+  const rrValues = closed.map((t) => effectiveRR(t)).filter((v) => v !== null);
   const avgRR = rrValues.length > 0 ? rrValues.reduce((a, b) => a + b, 0) / rrValues.length : 0;
 
   // Equity curve + drawdown, walked chronologically from the starting balance.
