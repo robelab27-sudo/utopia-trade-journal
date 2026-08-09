@@ -1,4 +1,4 @@
-  :root{
+:root{
     --bg:#0A0E14;
     --bg-elev:#0D1119;
     --glass:rgba(255,255,255,0.045);
@@ -410,7 +410,7 @@
 }
 
 .filter-panel{
-  display:none; grid-template-columns:repeat(5, 1fr); gap:12px;
+  display:none; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;
   background:var(--glass); border:1px solid var(--glass-border); border-radius:var(--radius-md);
   padding:16px 18px; margin-bottom:16px;
 }
