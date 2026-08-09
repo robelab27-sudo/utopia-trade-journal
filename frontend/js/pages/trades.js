@@ -16,7 +16,6 @@ import { parseImportFile } from '../lib/broker-import.js';
 import { applyThemeForUser } from '../theme.js';
 import { mountAccountSwitcher } from '../components/account-switcher.js';
 import { getActiveAccountId } from '../lib/account-context.js';
-import { effectiveRR } from '../stats.js';
 import '../lib/mobile-nav.js';
 
 let activeAccountId = null; // cached locally since getFilteredSorted() runs synchronously
@@ -70,6 +69,7 @@ function currentFilters() {
     direction: document.getElementById('filterDirection').value,
     status: document.getElementById('filterStatus').value,
     session: document.getElementById('filterSession').value,
+    timeframe: document.getElementById('filterTimeframe').value,
     dateFrom: document.getElementById('filterDateFrom').value,
     dateTo: document.getElementById('filterDateTo').value,
   };
@@ -91,6 +91,7 @@ function getFilteredSorted() {
   if (f.direction) trades = trades.filter((t) => t.direction === f.direction);
   if (f.status) trades = trades.filter((t) => t.trade_status === f.status);
   if (f.session) trades = trades.filter((t) => t.session === f.session);
+  if (f.timeframe) trades = trades.filter((t) => t.timeframe === f.timeframe);
   if (f.dateFrom) trades = trades.filter((t) => (t.entry_date || '') >= f.dateFrom);
   if (f.dateTo) trades = trades.filter((t) => (t.entry_date || '') <= f.dateTo);
 
@@ -168,7 +169,7 @@ function renderTable() {
       <td><span class="dir-badge ${trade.direction}">${trade.direction === 'buy' ? '▲ Buy' : '▼ Sell'}</span></td>
       <td>${escapeHtml(trade.session) || '<span style="color:var(--text-dim)">—</span>'}</td>
       <td>${escapeHtml(trade.strategy) || '<span style="color:var(--text-dim)">—</span>'}</td>
-      <td class="rr-cell">${(() => { const r = effectiveRR(trade); return r !== null ? r.toFixed(2) + 'R' : '—'; })()}</td>
+      <td class="rr-cell">${trade.rr !== null && trade.rr !== undefined ? trade.rr + 'R' : '—'}</td>
       <td class="pnl-cell ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}$${Math.abs(trade.net_profit || 0).toFixed(2)}</td>
       <td><span class="status-chip ${trade.trade_status}">${trade.trade_status}</span></td>
       <td><div class="row-actions">${actionsHtml}</div></td>
@@ -233,7 +234,7 @@ async function loadAndRender() {
 // ---------------------------------------------------------------------------
 document.getElementById('searchInput').addEventListener('input', () => { currentPage = 1; renderTable(); });
 document.getElementById('sortSelect').addEventListener('change', () => { currentPage = 1; renderTable(); });
-for (const id of ['filterDirection', 'filterStatus', 'filterSession', 'filterDateFrom', 'filterDateTo']) {
+for (const id of ['filterDirection', 'filterStatus', 'filterSession', 'filterTimeframe', 'filterDateFrom', 'filterDateTo']) {
   document.getElementById(id).addEventListener('change', () => { currentPage = 1; renderTable(); });
 }
 
