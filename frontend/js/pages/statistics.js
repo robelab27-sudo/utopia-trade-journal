@@ -42,7 +42,7 @@ const MINT = '#3DDC97', CORAL = '#FF6B6B', PERIWINKLE = '#7C9EFF', AMBER = '#F5B
 const charts = {};
 function destroy(key) { if (charts[key]) { charts[key].destroy(); charts[key] = null; } }
 
-const ALL_CHART_IDS = ['equityChart', 'winLossChart', 'rrChart', 'periodChart', 'pairChart', 'strategyChart', 'weekdayChart', 'longShortChart', 'emotionChart', 'mistakeChart'];
+const ALL_CHART_IDS = ['equityChart', 'winLossChart', 'rrChart', 'periodChart', 'pairChart', 'strategyChart', 'weekdayChart', 'timeframeChart', 'sessionStatsChart', 'longShortChart', 'emotionChart', 'mistakeChart'];
 
 // Captured once, before any render ever runs, so we always have a stable
 // handle on each chart's wrapper — even after its canvas has been swapped
@@ -349,6 +349,7 @@ function renderBWTable(adv) {
     ['Pair', adv.bestPair, adv.worstPair],
     ['Strategy', adv.bestStrategy, adv.worstStrategy],
     ['Session', adv.bestSession, adv.worstSession],
+    ['Timeframe', adv.bestTimeframe, adv.worstTimeframe],
     ['Month', adv.bestMonth, adv.worstMonth],
   ];
 
@@ -396,6 +397,8 @@ async function renderAll() {
   renderPeriodChart(closed);
   renderBarChart('pairChart', 'pair', groupSum(closed, (t) => t.pair), MINT);
   renderBarChart('strategyChart', 'strategy', groupSum(closed, (t) => t.strategy), PERIWINKLE);
+  renderBarChart('timeframeChart', 'timeframe', groupSum(closed, (t) => t.timeframe), AMBER);
+  renderBarChart('sessionStatsChart', 'sessionStats', groupSum(closed, (t) => t.session), PERIWINKLE);
   renderWeekdayChart(closed);
   renderLongShortChart(closed);
   renderEmotionChart(closed);
