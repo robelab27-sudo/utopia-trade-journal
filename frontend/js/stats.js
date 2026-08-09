@@ -123,6 +123,7 @@ export function computeAdvancedStats(trades) {
   const pairBW = bestWorst((t) => t.pair);
   const strategyBW = bestWorst((t) => t.strategy);
   const sessionBW = bestWorst((t) => t.session);
+  const timeframeBW = bestWorst((t) => t.timeframe);
   const monthBW = bestWorst((t) => (t.entry_date || '').slice(0, 7));
 
   const holdingTimes = closed
@@ -143,6 +144,7 @@ export function computeAdvancedStats(trades) {
     bestPair: pairBW.best, worstPair: pairBW.worst,
     bestStrategy: strategyBW.best, worstStrategy: strategyBW.worst,
     bestSession: sessionBW.best, worstSession: sessionBW.worst,
+    bestTimeframe: timeframeBW.best, worstTimeframe: timeframeBW.worst,
     bestMonth: monthBW.best, worstMonth: monthBW.worst,
     avgHoldingHours,
     totalTrades: closed.length,
