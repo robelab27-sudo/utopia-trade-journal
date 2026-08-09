@@ -46,6 +46,14 @@ function modalMarkup() {
           <div class="field"><label for="tSession">Session</label>
             <select id="tSession"><option value="">—</option><option>Asia</option><option>London</option><option>NY AM</option><option>NY PM</option></select>
           </div>
+          <div class="field"><label for="tTimeframe">Timeframe</label>
+            <select id="tTimeframe">
+              <option value="">—</option>
+              <option>1m</option><option>2m</option><option>3m</option><option>5m</option>
+              <option>15m</option><option>30m</option><option>1H</option><option>4H</option>
+              <option>Daily</option><option>Weekly</option>
+            </select>
+          </div>
           <div class="field"><label for="tStrategy">Strategy</label><input type="text" id="tStrategy" placeholder="Breakout, reversal…"></div>
           <div class="field"><label for="tNetProfit">Net Profit *</label><input type="number" step="any" id="tNetProfit" required></div>
           <div class="field"><label for="tStatus">Status</label>
@@ -107,6 +115,7 @@ function mount() {
       lot_size: numOrNull('tLotSize'),
       rr: numOrNull('tRR'),
       session: document.getElementById('tSession').value || null,
+      timeframe: document.getElementById('tTimeframe').value || null,
       strategy: document.getElementById('tStrategy').value.trim() || null,
       net_profit: numOrNull('tNetProfit'),
       gross_profit: numOrNull('tNetProfit'),
@@ -176,7 +185,7 @@ export async function openTradeModal({ mode = 'create', trade = null } = {}) {
     const FIELD_TO_KEY = {
       tPair: 'pair', tDirection: 'direction', tEntryDate: 'entry_date', tExitDate: 'exit_date',
       tEntryPrice: 'entry_price', tExitPrice: 'exit_price', tStopLoss: 'stop_loss', tTakeProfit: 'take_profit',
-      tLotSize: 'lot_size', tRR: 'rr', tSession: 'session', tStrategy: 'strategy',
+      tLotSize: 'lot_size', tRR: 'rr', tSession: 'session', tTimeframe: 'timeframe', tStrategy: 'strategy',
       tNetProfit: 'net_profit', tStatus: 'trade_status', tNotes: 'notes',
     };
     for (const [fieldId, key] of Object.entries(FIELD_TO_KEY)) {
