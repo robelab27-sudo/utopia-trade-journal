@@ -42,7 +42,7 @@ const MINT = '#3DDC97', CORAL = '#FF6B6B', PERIWINKLE = '#7C9EFF', AMBER = '#F5B
 const charts = {};
 function destroy(key) { if (charts[key]) { charts[key].destroy(); charts[key] = null; } }
 
-const ALL_CHART_IDS = ['equityChart', 'winLossChart', 'rrChart', 'periodChart', 'pairChart', 'strategyChart', 'weekdayChart', 'timeframeChart', 'sessionStatsChart', 'longShortChart', 'emotionChart', 'mistakeChart'];
+const ALL_CHART_IDS = ['equityChart', 'winLossChart', 'rrChart', 'periodChart', 'pairChart', 'strategyChart', 'weekdayChart', 'timeframeChart', 'sessionStatsChart', 'longShortChart', 'emotionChart', 'mistakeChart', 'mgmtFreqChart', 'mgmtImpactChart'];
 
 // Captured once, before any render ever runs, so we always have a stable
 // handle on each chart's wrapper — even after its canvas has been swapped
@@ -339,6 +339,58 @@ function renderMistakeChart(closed) {
 }
 
 // ---------------------------------------------------------------------------
+// Trade Management tags (stored in the generic `tags` field) — frequency
+// and P&L impact, same pattern as Mistake Analysis above.
+// ---------------------------------------------------------------------------
+const GOOD_MGMT_TAGS = new Set(['Good Exit', 'Good BE', 'Trailed Well', 'Let Winner Run', 'Scaled Out Well']);
+
+function renderManagementCharts(closed) {
+  destroy('mgmtFreq');
+  destroy('mgmtImpact');
+
+  const counts = new Map();
+  const impact = new Map();
+  for (const t of closed) {
+    for (const tag of (t.tags || [])) {
+      if (!GOOD_MGMT_TAGS.has(tag) && !['Early Exit', 'Held Too Long', 'Panic Exit', 'Stop Moved Too Tight', 'No Management Plan'].includes(tag)) continue;
+      counts.set(tag, (counts.get(tag) || 0) + 1);
+      if (typeof t.net_profit === 'number') impact.set(tag, (impact.get(tag) || 0) + t.net_profit);
+    }
+  }
+
+  const freqEntries = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  const freqWrap = document.getElementById('mgmtFreqChart').parentElement;
+  const impactWrap = document.getElementById('mgmtImpactChart')?.parentElement;
+
+  if (freqEntries.length === 0) {
+    showEmptyState('mgmtFreqChart', 'Tag trade management (Good Exit, Early Exit, etc.) when editing a trade to see this.');
+    showEmptyState('mgmtImpactChart', 'Tag trade management on your trades to see this chart.');
+    return;
+  }
+  restoreCanvas('mgmtFreqChart');
+  restoreCanvas('mgmtImpactChart');
+
+  charts.mgmtFreq = new Chart(document.getElementById('mgmtFreqChart'), {
+    type: 'bar',
+    data: {
+      labels: freqEntries.map((e) => e[0]),
+      datasets: [{ data: freqEntries.map((e) => e[1]), backgroundColor: (ctx) => (GOOD_MGMT_TAGS.has(freqEntries[ctx.dataIndex][0]) ? MINT : CORAL), borderRadius: 6, barThickness: 16 }],
+    },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { display: false } } } },
+  });
+
+  const impactEntries = freqEntries.map((e) => [e[0], impact.get(e[0]) || 0]);
+  charts.mgmtImpact = new Chart(document.getElementById('mgmtImpactChart'), {
+    type: 'bar',
+    data: {
+      labels: impactEntries.map((e) => e[0]),
+      datasets: [{ data: impactEntries.map((e) => e[1]), backgroundColor: (ctx) => (ctx.raw >= 0 ? MINT : CORAL), borderRadius: 6, barThickness: 16 }],
+    },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (v) => '$' + v } }, y: { grid: { display: false } } } },
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Best / worst table
 // ---------------------------------------------------------------------------
 function renderBWTable(adv) {
@@ -403,6 +455,7 @@ async function renderAll() {
   renderLongShortChart(closed);
   renderEmotionChart(closed);
   renderMistakeChart(closed);
+  renderManagementCharts(closed);
   renderBWTable(adv);
   renderBreakdownTable(closed);
 }
