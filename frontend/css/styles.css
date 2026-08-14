@@ -853,3 +853,19 @@ html[data-theme="light"] .goal-progress-track{ background:rgba(15,20,30,0.06); }
   .journal-editor-head{ flex-wrap:wrap; }
   .cal-grid-lg{ grid-template-columns:repeat(7, minmax(0,1fr)); }
 }
+
+/* ========================================================================
+   Trade Management tags (Add/Edit Trade form)
+   ======================================================================== */
+.mgmt-tag-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+.mgmt-tag{
+  display:flex; align-items:center; gap:6px;
+  padding:7px 12px; border-radius:100px; font-size:12.5px; font-weight:500;
+  cursor:pointer; border:1px solid var(--glass-border); background:var(--glass);
+  color:var(--text-muted); transition:background 0.15s, border-color 0.15s, color 0.15s;
+  user-select:none;
+}
+.mgmt-tag input{ display:none; }
+.mgmt-tag:hover{ background:var(--glass-hover); }
+.mgmt-tag.good:has(input:checked){ background:var(--mint-dim); border-color:rgba(61,220,151,0.35); color:var(--mint); }
+.mgmt-tag.bad:has(input:checked){ background:var(--coral-dim); border-color:rgba(255,107,107,0.35); color:var(--coral); }
