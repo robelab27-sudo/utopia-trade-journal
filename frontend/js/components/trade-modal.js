@@ -62,6 +62,21 @@ function modalMarkup() {
           <div class="field span-2"><label for="tNotes">Notes</label><textarea id="tNotes" placeholder="What happened on this trade?"></textarea></div>
         </div>
         <div class="journal-section" style="margin-top:6px;">
+          <div class="journal-section-title">Trade Management</div>
+          <div class="mgmt-tag-grid" id="tManagementTags">
+            <label class="mgmt-tag good"><input type="checkbox" value="Good Exit"> Good Exit</label>
+            <label class="mgmt-tag good"><input type="checkbox" value="Good BE"> Good BE</label>
+            <label class="mgmt-tag good"><input type="checkbox" value="Trailed Well"> Trailed Well</label>
+            <label class="mgmt-tag good"><input type="checkbox" value="Let Winner Run"> Let Winner Run</label>
+            <label class="mgmt-tag good"><input type="checkbox" value="Scaled Out Well"> Scaled Out Well</label>
+            <label class="mgmt-tag bad"><input type="checkbox" value="Early Exit"> Early Exit</label>
+            <label class="mgmt-tag bad"><input type="checkbox" value="Held Too Long"> Held Too Long</label>
+            <label class="mgmt-tag bad"><input type="checkbox" value="Panic Exit"> Panic Exit</label>
+            <label class="mgmt-tag bad"><input type="checkbox" value="Stop Moved Too Tight"> Stop Moved Too Tight</label>
+            <label class="mgmt-tag bad"><input type="checkbox" value="No Management Plan"> No Management Plan</label>
+          </div>
+        </div>
+        <div class="journal-section" style="margin-top:6px;">
           <div class="journal-section-title">Screenshots</div>
           <div id="tradeModalScreenshots"></div>
           <div class="card-sub" id="tradeModalScreenshotsHint" style="display:none;">Save the trade first, then add screenshots here by editing it.</div>
@@ -122,6 +137,7 @@ function mount() {
       trade_status: document.getElementById('tStatus').value,
       notes: document.getElementById('tNotes').value.trim(),
       source: 'manual',
+      tags: [...document.querySelectorAll('#tManagementTags input:checked')].map((cb) => cb.value),
     };
 
     const accountId = document.getElementById('tAccount').value || null;
@@ -193,6 +209,10 @@ export async function openTradeModal({ mode = 'create', trade = null } = {}) {
       const el = document.getElementById(fieldId);
       if (el && value !== undefined && value !== null) el.value = value;
     }
+    const savedTags = Array.isArray(trade.tags) ? trade.tags : [];
+    document.querySelectorAll('#tManagementTags input').forEach((cb) => {
+      cb.checked = savedTags.includes(cb.value);
+    });
   } else {
     document.getElementById('tEntryDate').value = new Date().toISOString().slice(0, 10);
   }
