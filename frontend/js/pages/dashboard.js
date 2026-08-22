@@ -254,7 +254,7 @@ function renderRecentTrades(recentTrades) {
     tr.innerHTML = `
       <td><div class="pair-cell"><div class="pair-flag">${(trade.pair || '?').slice(0, 2).toUpperCase()}</div> ${escapeHtml(trade.pair || '')}</div></td>
       <td><span class="dir-badge ${trade.direction}">${trade.direction === 'buy' ? '▲ Buy' : '▼ Sell'}</span></td>
-      <td class="num">${trade.entry_date || ''}</td>
+      <td class="num">${trade.entry_date || ''}${trade.entry_time ? ' ' + trade.entry_time.slice(0, 5) : ''}</td>
       <td class="rr-cell">${(() => { const r = effectiveRR(trade); return r !== null ? r.toFixed(2) + 'R' : '—'; })()}</td>
       <td class="pnl-cell ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}$${Math.abs(trade.net_profit).toFixed(2)}</td>
     `;
