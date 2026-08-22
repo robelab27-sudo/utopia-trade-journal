@@ -36,7 +36,9 @@ function modalMarkup() {
             <select id="tAccount"><option value="">Unassigned</option></select>
           </div>
           <div class="field"><label for="tEntryDate">Entry Date *</label><input type="date" id="tEntryDate" required></div>
+          <div class="field"><label for="tEntryTime">Entry Time</label><input type="time" id="tEntryTime" step="1"></div>
           <div class="field"><label for="tExitDate">Exit Date</label><input type="date" id="tExitDate"></div>
+          <div class="field"><label for="tExitTime">Exit Time</label><input type="time" id="tExitTime" step="1"></div>
           <div class="field"><label for="tEntryPrice">Entry Price</label><input type="number" step="any" id="tEntryPrice"></div>
           <div class="field"><label for="tExitPrice">Exit Price</label><input type="number" step="any" id="tExitPrice"></div>
           <div class="field"><label for="tStopLoss">Stop Loss</label><input type="number" step="any" id="tStopLoss"></div>
@@ -122,7 +124,9 @@ function mount() {
       pair: document.getElementById('tPair').value.trim().toUpperCase(),
       direction: document.getElementById('tDirection').value,
       entry_date: document.getElementById('tEntryDate').value,
+      entry_time: document.getElementById('tEntryTime').value || null,
       exit_date: document.getElementById('tExitDate').value || null,
+      exit_time: document.getElementById('tExitTime').value || null,
       entry_price: numOrNull('tEntryPrice'),
       exit_price: numOrNull('tExitPrice'),
       stop_loss: numOrNull('tStopLoss'),
@@ -199,7 +203,8 @@ export async function openTradeModal({ mode = 'create', trade = null } = {}) {
 
   if (trade) {
     const FIELD_TO_KEY = {
-      tPair: 'pair', tDirection: 'direction', tEntryDate: 'entry_date', tExitDate: 'exit_date',
+      tPair: 'pair', tDirection: 'direction', tEntryDate: 'entry_date', tEntryTime: 'entry_time',
+      tExitDate: 'exit_date', tExitTime: 'exit_time',
       tEntryPrice: 'entry_price', tExitPrice: 'exit_price', tStopLoss: 'stop_loss', tTakeProfit: 'take_profit',
       tLotSize: 'lot_size', tRR: 'rr', tSession: 'session', tTimeframe: 'timeframe', tStrategy: 'strategy',
       tNetProfit: 'net_profit', tStatus: 'trade_status', tNotes: 'notes',
