@@ -164,7 +164,7 @@ function renderTable() {
 
     tr.innerHTML = `
       <td><input type="checkbox" class="row-check" data-select-id="${trade.id}" ${checked}></td>
-      <td class="num">${trade.entry_date || ''}</td>
+      <td class="num">${trade.entry_date || ''}${trade.entry_time ? ' ' + trade.entry_time.slice(0, 5) : ''}</td>
       <td><div class="pair-cell"><div class="pair-flag">${(trade.pair || '?').slice(0, 2).toUpperCase()}</div> ${escapeHtml(trade.pair)}</div></td>
       <td><span class="dir-badge ${trade.direction}">${trade.direction === 'buy' ? '▲ Buy' : '▼ Sell'}</span></td>
       <td>${escapeHtml(trade.session) || '<span style="color:var(--text-dim)">—</span>'}</td>
